@@ -1,0 +1,30 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",    "x": 0,    "y": 0, "w": 1440, "h": 1000, "title": "1. 입력" },
+    { "file": "Working.dc.html", "x": 1520, "y": 0, "w": 1440, "h": 1000, "title": "2. 만드는 중" },
+    { "file": "Done.dc.html",    "x": 3040, "y": 0, "w": 1440, "h": 1100, "title": "3. 완료" }
+  ],
+  "annotations": [
+    {
+      "id": "one-screen",
+      "x": -330, "y": 0, "w": 270,
+      "text": "세 아트보드는 서로 다른 화면이 아니라 같은 화면(/)의 세 상태입니다.\n\n입력 폼과 생성 이력이 한 페이지에 있고, 생성은 POST /api/generate 한 번으로 끝나는 동기 요청입니다. 그래서 진행률 표시나 단계 목록이 없고, 버튼이 대기 상태로 바뀌는 것이 전부입니다.\n\n완료되면 폼 아래에 다운로드 링크가 붙고 router.refresh()로 이력 맨 위에 새 항목이 들어옵니다."
+    },
+    {
+      "id": "limits",
+      "x": -330, "y": 420, "w": 270,
+      "text": "실제 입력 제한 (src/lib/deck/schema.ts)\n\n회사명 60자\n텍스트 5,000자\nPDF 10MB\n생성 제한시간 60초\n\n앞선 설계안의 파일 20개·50MB·자료 검토 단계는 이 MVP에 없습니다."
+    },
+    {
+      "id": "errors",
+      "x": 4550, "y": 0, "w": 280,
+      "text": "폼에 그대로 뜨는 오류 문구 (route.ts)\n\nPDF 파일이 없습니다\nPDF는 10MB를 넘을 수 없습니다\nPDF 파일만 지원합니다\nPDF에서 텍스트를 읽지 못했습니다\nPDF를 읽는 중 오류가 발생했습니다\n네트워크 오류가 발생했습니다\n\n오류는 버튼 위에 danger 색으로 한 줄 뜨고 role=alert이 붙습니다. 자료 부족·수치 상충 같은 근거 관련 상태는 이 MVP에 없습니다."
+    },
+    {
+      "id": "archived",
+      "x": 4550, "y": 480, "w": 280,
+      "text": "보관된 설계안\n\ndesign/ 폴더에 Projects · Upload · Review · Progress · Deck 아트보드가 남아 있습니다. PRD 전문을 반영한 것이라 지금 MVP보다 범위가 넓습니다.\n\n프로젝트 관리와 근거 추적으로 확장할 때 다시 꺼내 쓰면 됩니다."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

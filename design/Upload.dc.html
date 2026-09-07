@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --paper: oklch(0.985 0.003 85);
+      --surface: oklch(1 0 0);
+      --ink: oklch(0.24 0.015 265);
+      --ink-muted: oklch(0.44 0.012 265);
+      --ink-faint: oklch(0.55 0.011 265);
+      --rule: oklch(0.89 0.006 265);
+      --rule-soft: oklch(0.94 0.004 265);
+      --seal: oklch(0.45 0.15 22);
+      --warn: oklch(0.55 0.11 70);
+      --ok: oklch(0.45 0.09 155);
+      --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-weight: 400; -webkit-font-smoothing: antialiased; }
+    a { color: var(--seal); text-decoration: none; }
+    a:hover { color: oklch(0.36 0.15 22); text-decoration: underline; }
+    .marg { text-align: right; font-size: 12px; line-height: 1.45; color: var(--ink-faint); letter-spacing: 0.02em; padding-top: 3px; }
+    .marg-fact { color: var(--ink-muted); font-weight: 500; }
+    .fn { font-family: var(--mono); font-size: 11px; color: var(--seal); vertical-align: super; line-height: 0; margin-left: 2px; font-weight: 500; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .btn-primary { font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--surface); background: var(--seal); border: 0; height: 40px; padding: 0 20px; cursor: pointer; }
+    .btn-quiet { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink); background: transparent; border: 1px solid var(--rule); height: 40px; padding: 0 18px; cursor: pointer; }
+    .btn-sm { font-family: var(--sans); font-size: 12.5px; font-weight: 400; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); height: 30px; padding: 0 11px; cursor: pointer; }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; background: var(--paper);">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--rule);">
+    <div style="display: flex; align-items: baseline; gap: 22px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em;">[서비스명]</span>
+      <span style="font-size: 13px; color: var(--ink-muted);">샘플웨이브</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <span style="font-size: 13px; color: var(--ink-muted);">도움말</span>
+      <div style="width: 27px; height: 27px; border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--ink-muted);">권</div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; height: 44px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--rule-soft);">
+    <span style="font-size: 12.5px; color: var(--ink-faint);">기본 정보</span>
+    <span style="width: 26px; height: 1px; background: var(--rule); margin: 0 12px;"></span>
+    <span style="font-size: 12.5px; color: var(--ink); font-weight: 600; border-bottom: 2px solid var(--seal); padding-bottom: 3px;">자료 올리기</span>
+    <span style="width: 26px; height: 1px; background: var(--rule); margin: 0 12px;"></span>
+    <span style="font-size: 12.5px; color: var(--ink-faint);">자료 검토</span>
+    <span style="width: 26px; height: 1px; background: var(--rule); margin: 0 12px;"></span>
+    <span style="font-size: 12.5px; color: var(--ink-faint);">만들기</span>
+    <span style="margin-left: auto; font-size: 12px; color: var(--ink-faint);" class="num">2 / 4</span>
+  </div>
+
+  <div style="padding: 34px 40px 56px; max-width: 916px;">
+
+    <h1 style="margin: 0 0 7px; font-size: 26px; font-weight: 600; letter-spacing: -0.015em;">회사 자료를 올려주세요</h1>
+    <p style="margin: 0 0 26px; font-size: 15px; line-height: 1.62; color: var(--ink-muted); max-width: 62ch;">회사소개서, 매출 자료, 보도된 기사, 캠페인 결과처럼 회사를 설명하는 자료면 무엇이든 됩니다. 자료가 많을수록 추정이 줄어듭니다.</p>
+
+    <!-- 드롭존 -->
+    <div style="border: 1px dashed var(--rule); background: var(--surface); padding: 34px 28px; text-align: center; margin-bottom: 22px;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="color: var(--ink-faint); margin-bottom: 12px;"><path d="M12 15.5 L12 4"/><path d="M7.5 8.5 L12 4 L16.5 8.5"/><path d="M3.5 15 L3.5 19.5 L20.5 19.5 L20.5 15"/></svg>
+      <div style="font-size: 15px; margin-bottom: 7px;">여기에 파일을 놓거나 <button class="btn-sm" style="height: 32px; border-color: var(--ink); font-weight: 500;">파일 고르기</button></div>
+      <div style="font-size: 12.5px; color: var(--ink-faint); line-height: 1.6;">PDF, DOCX, PPTX, XLSX, CSV, TXT, 이미지<br>파일 하나에 <span class="num">50MB</span>까지, 이미지는 <span class="num">20MB</span>까지</div>
+    </div>
+
+    <!-- 용량 -->
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 6px; font-size: 12.5px; color: var(--ink-muted);">
+      <span>파일 <span class="num" style="color: var(--ink); font-weight: 500;">4</span> / <span class="num">20</span>개</span>
+      <span style="width: 1px; height: 12px; background: var(--rule);"></span>
+      <span>용량 <span class="num" style="color: var(--ink); font-weight: 500;">34MB</span> / <span class="num">200MB</span></span>
+      <div style="flex-grow: 1; height: 3px; background: var(--rule-soft); max-width: 168px;">
+        <div style="width: 17%; height: 100%; background: var(--ink-muted);"></div>
+      </div>
+    </div>
+
+    <!-- 파일 목록 -->
+    <div style="border-top: 1px solid var(--ink); margin-bottom: 30px;">
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 180px 96px; gap: 18px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-size: 14.5px;">회사소개서.pdf</span>
+          <span class="num" style="font-size: 12px; color: var(--ink-faint);">12.4MB</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok);"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+          <span style="font-size: 13px;">읽기 완료 · 사실 <span class="num">11</span>건</span>
+        </div>
+        <div style="text-align: right;"><button class="btn-sm" style="border-color: transparent; background: transparent; padding-right: 0; color: var(--ink-muted);">지우기</button></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 180px 96px; gap: 18px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-size: 14.5px;">매출추이.xlsx</span>
+          <span class="num" style="font-size: 12px; color: var(--ink-faint);">840KB</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok);"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+          <span style="font-size: 13px;">읽기 완료 · 사실 <span class="num">9</span>건</span>
+        </div>
+        <div style="text-align: right;"><button class="btn-sm" style="border-color: transparent; background: transparent; padding-right: 0; color: var(--ink-muted);">지우기</button></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 180px 96px; gap: 18px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-size: 14.5px;">캠페인결과_2023.pptx</span>
+          <span class="num" style="font-size: 12px; color: var(--ink-faint);">20.6MB</span>
+        </div>
+        <div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-size: 13px;">내용 읽는 중</span>
+            <span class="num" style="font-size: 12px; color: var(--ink-faint);">42%</span>
+          </div>
+          <div style="height: 3px; background: var(--rule-soft);"><div style="width: 42%; height: 100%; background: var(--seal);"></div></div>
+        </div>
+        <div style="text-align: right;"><button class="btn-sm" style="border-color: transparent; background: transparent; padding-right: 0; color: var(--ink-muted);">멈추기</button></div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 0 24px; padding: 14px 0; border-bottom: 1px solid var(--rule-soft); background: repeating-linear-gradient(-45deg, transparent 0 7px, oklch(0.955 0.004 265) 7px 8px);">
+        <div class="marg" style="color: var(--warn); font-weight: 500; padding-top: 3px;">오류</div>
+        <div style="padding-right: 16px;">
+          <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px;">
+            <span style="font-size: 14.5px;">해외실적.xlsx</span>
+            <span class="num" style="font-size: 12px; color: var(--ink-faint);">312KB</span>
+          </div>
+          <div style="font-size: 13.5px; line-height: 1.62; color: var(--ink-muted); max-width: 54ch;">암호가 걸려 있어 내용을 읽지 못했습니다. 암호를 해제한 파일로 다시 올리거나 CSV로 저장해 올려주세요.</div>
+          <div style="margin-top: 11px; display: flex; gap: 9px;">
+            <button class="btn-sm">다시 올리기</button>
+            <button class="btn-sm" style="border-color: transparent; background: transparent; padding-left: 0; color: var(--ink-muted);">이 파일 빼기</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 180px 96px; gap: 18px; align-items: center; padding: 14px 0;">
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+          <span style="font-size: 14.5px;">도쿄팝업_현장사진.jpg</span>
+          <span class="num" style="font-size: 12px; color: var(--ink-faint);">3.1MB</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ink-faint);"><path d="M10 5.5 L10 10 L13.5 12"/><circle cx="10" cy="10" r="7.5"/></svg>
+          <span style="font-size: 13px; color: var(--ink-muted);">글자 읽기 대기 중</span>
+        </div>
+        <div style="text-align: right;"><button class="btn-sm" style="border-color: transparent; background: transparent; padding-right: 0; color: var(--ink-muted);">지우기</button></div>
+      </div>
+    </div>
+
+    <!-- 텍스트 입력 -->
+    <div style="margin-bottom: 30px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px;">
+        <label style="font-size: 13px; font-weight: 600;">직접 적어둘 내용</label>
+        <span class="num" style="font-size: 12px; color: var(--ink-faint);">1,840 / 50,000자</span>
+      </div>
+      <div style="border: 1px solid var(--rule); background: var(--surface); padding: 14px 15px; min-height: 108px; font-size: 14px; line-height: 1.7; color: var(--ink-muted);">
+        2019년 3월 두 명이 시작했고, 첫 제품은 주방 수납함이었습니다. 2023년 9월 편의점 체인에 들어가면서 매출이 크게 올랐고, 2025년 6월 도쿄에서 2주 팝업을 열었습니다.<span style="display: inline-block; width: 1px; height: 15px; background: var(--seal); vertical-align: text-bottom; margin-left: 1px;"></span>
+      </div>
+      <div style="margin-top: 7px; font-size: 12.5px; color: var(--ink-faint); line-height: 1.6;">파일에 없는 연혁이나 사건을 적어두면 함께 읽습니다. 여기 적은 내용도 출처로 남습니다.</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; padding-top: 22px; border-top: 1px solid var(--rule);">
+      <button class="btn-primary">자료 읽기 시작</button>
+      <button class="btn-quiet">이전</button>
+      <span style="margin-left: auto; font-size: 12.5px; color: var(--ink-faint);">읽고 있는 파일이 있어도 지금 시작할 수 있습니다</span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

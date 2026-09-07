@@ -1,0 +1,749 @@
+openapi: 3.1.0
+
+# ⚠ 이 스펙은 정본이 아니다 (2026-09-07 결정).
+# 실제 계약은 `POST /api/generate` 하나이고 zod로 검증한다 (src/lib/deck/schema.ts).
+# 이 문서는 PRD 전문을 그대로 옮긴 초안이라 실제 MVP보다 범위가 훨씬 넓다.
+# 차이는 src/mocks/README.md에 표로 정리했다.
+# 지우지 않고 남긴 이유: 프로젝트·근거 추적·Job 폴링으로 확장할 때 참고 자료가 된다.
+#
+# 이 스펙은 프론트엔드가 먼저 쓴 초안이다.
+# 백엔드와 합의되면 백엔드 저장소의 스펙이 SSOT가 되고 이 파일은 지운다.
+# 근거: docs/FRONTEND_PRD_REVIEW.md §4.3 CONTRACT-001
+# 범위: MVP만. 수정 요청(Revision 생성)과 PDF는 Phase 2라서 넣지 않았다.
+
+info:
+  title: IR 자료 생성 API (프론트 초안)
+  version: 0.1.0-draft
+  description: |
+    회사 자료를 올려 IR 발표자료를 만드는 서비스의 API 초안.
+    상태 Enum과 오류 code는 프론트와 백엔드가 이 문서 하나로 공유한다.
+
+servers:
+  - url: /api/v1
+
+tags:
+  - name: projects
+  - name: sources
+  - name: evidence
+  - name: generation
+  - name: decks
+
+paths:
+  /projects:
+    get:
+      tags: [projects]
+      operationId: listProjects
+      summary: 프로젝트 목록
+      parameters:
+        - { name: q, in: query, schema: { type: string }, description: 회사명 검색 }
+        - { name: status, in: query, schema: { $ref: '#/components/schemas/ProjectStatus' } }
+        - { name: cursor, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, default: 20, maximum: 50 } }
+      responses:
+        '200':
+          description: 최근 수정순
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, page]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/ProjectSummary' } }
+                  page: { $ref: '#/components/schemas/Page' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [projects]
+      operationId: createProject
+      summary: 프로젝트 생성
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProjectCreate' }
+      responses:
+        '201':
+          description: 생성됨
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /projects/{projectId}:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    get:
+      tags: [projects]
+      operationId: getProject
+      summary: 프로젝트 상세와 현재 단계
+      responses:
+        '200':
+          description: 현재 단계 복원에 쓴다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [projects]
+      operationId: updateProject
+      summary: 프로젝트명과 목적 수정
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                company_name: { type: string, minLength: 1, maxLength: 100 }
+                purpose: { type: string, maxLength: 100 }
+      responses:
+        '200':
+          description: 수정됨
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [projects]
+      operationId: deleteProject
+      summary: 프로젝트 삭제
+      description: 원본 자료, 분석 결과, 산출물, 모든 Revision을 함께 지운다. 유예 기간은 없다.
+      responses:
+        '202':
+          description: 삭제 시작. status가 deleting으로 바뀐다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Project' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /projects/{projectId}/uploads:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    post:
+      tags: [sources]
+      operationId: createUploadUrl
+      summary: 서명 업로드 URL 발급
+      description: 파일은 API 서버를 거치지 않고 객체 저장소로 직접 올린다 (PERF-006).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [filename, size_bytes, content_type]
+              properties:
+                filename: { type: string, description: 한글 파일명을 그대로 받는다 }
+                size_bytes: { type: integer, maximum: 52428800, description: 50MB 상한 }
+                content_type: { type: string }
+      responses:
+        '201':
+          description: 발급됨
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [source_asset_id, upload_url, expires_at]
+                properties:
+                  source_asset_id: { type: string }
+                  upload_url: { type: string, format: uri }
+                  expires_at: { type: string, format: date-time }
+        '413': { $ref: '#/components/responses/TooLarge' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /projects/{projectId}/sources:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    get:
+      tags: [sources]
+      operationId: listSources
+      summary: 올린 자료와 처리 상태
+      responses:
+        '200':
+          description: 업로드 순서와 무관하게 안정된 순서를 유지한다 (FE-041)
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, quota]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/SourceAsset' } }
+                  quota: { $ref: '#/components/schemas/Quota' }
+
+  /projects/{projectId}/sources/text:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    post:
+      tags: [sources]
+      operationId: createTextSource
+      summary: 직접 입력한 설명 등록
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content: { type: string, maxLength: 50000 }
+      responses:
+        '201':
+          description: 등록됨. 이 내용도 출처로 남는다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SourceAsset' }
+
+  /projects/{projectId}/sources/{sourceId}:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { $ref: '#/components/parameters/sourceId' }
+    delete:
+      tags: [sources]
+      operationId: deleteSource
+      summary: 자료 하나 삭제
+      responses:
+        '204': { description: 삭제됨 }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /projects/{projectId}/sources/{sourceId}/retry:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { $ref: '#/components/parameters/sourceId' }
+    post:
+      tags: [sources]
+      operationId: retrySource
+      summary: 파일 처리 재시도
+      description: error.retryable이 true인 자료만 받는다.
+      responses:
+        '202':
+          description: 재시도 시작
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SourceAsset' }
+        '409':
+          description: 재시도할 수 없는 실패
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /projects/{projectId}/evidence/summary:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    get:
+      tags: [evidence]
+      operationId: getEvidenceSummary
+      summary: 확인된 사실, 부족 정보, 상충 조회
+      responses:
+        '200':
+          description: 자료 검토 화면의 주 데이터
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EvidenceSummary' }
+
+  /projects/{projectId}/evidence/{evidenceId}:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { name: evidenceId, in: path, required: true, schema: { type: string } }
+    get:
+      tags: [evidence]
+      operationId: getEvidence
+      summary: 원문 위치와 발췌
+      responses:
+        '200':
+          description: 출처 드로어에 쓴다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Evidence' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /projects/{projectId}/evidence/conflicts/{conflictId}/resolve:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { name: conflictId, in: path, required: true, schema: { type: string } }
+    post:
+      tags: [evidence]
+      operationId: resolveConflict
+      summary: 상충하는 값 중 하나 선택
+      description: 고르지 않고 넘어갈 수 있다. 그때는 확정 수치로 쓰지 않는다.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [chosen_candidate_id]
+              properties:
+                chosen_candidate_id: { type: string }
+      responses:
+        '200':
+          description: 선택 근거가 기록된다 (FE-055)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EvidenceConflict' }
+
+  /projects/{projectId}/generations:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    post:
+      tags: [generation]
+      operationId: startGeneration
+      summary: 생성 시작
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+          description: 같은 설정으로 재요청하면 같은 키를 보낸다. 검토서 §3.4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GenerationRequest' }
+      responses:
+        '202':
+          description: 작업이 만들어졌다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Job' }
+        '409':
+          description: 같은 키로 이미 진행 중. 새 작업을 만들지 않고 그 작업으로 보낸다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Job' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+
+  /jobs/{jobId}:
+    parameters: [{ $ref: '#/components/parameters/jobId' }]
+    get:
+      tags: [generation]
+      operationId: getJob
+      summary: 작업 상태
+      description: 진행률은 백엔드가 완료한 단계만 반영한다 (PRD §5.3).
+      responses:
+        '200':
+          description: 폴링 대상
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Job' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /jobs/{jobId}/cancel:
+    parameters: [{ $ref: '#/components/parameters/jobId' }]
+    post:
+      tags: [generation]
+      operationId: cancelJob
+      summary: 작업 취소
+      responses:
+        '202':
+          description: 취소 요청됨
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Job' }
+        '409':
+          description: 이미 끝난 작업
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /projects/{projectId}/decks:
+    parameters: [{ $ref: '#/components/parameters/projectId' }]
+    get:
+      tags: [decks]
+      operationId: listDecks
+      summary: Revision 목록
+      responses:
+        '200':
+          description: 최신순
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/DeckRevisionSummary' } }
+
+  /projects/{projectId}/decks/{revisionId}:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { $ref: '#/components/parameters/revisionId' }
+    get:
+      tags: [decks]
+      operationId: getDeck
+      summary: 결과 조회
+      responses:
+        '200':
+          description: 슬라이드별 핵심 메시지, 출처, 경고를 포함한다
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeckRevision' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /projects/{projectId}/decks/{revisionId}/previews:
+    parameters:
+      - { $ref: '#/components/parameters/projectId' }
+      - { $ref: '#/components/parameters/revisionId' }
+    get:
+      tags: [decks]
+      operationId: getDeckPreviews
+      summary: 슬라이드 이미지 URL
+      description: |
+        브라우저에서 PPTX를 직접 렌더링하지 않는다 (PRD §10.8).
+        백엔드가 만든 검수용 이미지를 쓴다. 썸네일 320px, 큰 이미지 1600px.
+      responses:
+        '200':
+          description: 슬라이드 순서대로
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items]
+                properties:
+                  items: { type: array, items: { $ref: '#/components/schemas/SlidePreview' } }
+
+  /artifacts/{artifactId}/download-url:
+    parameters:
+      - { name: artifactId, in: path, required: true, schema: { type: string } }
+    post:
+      tags: [decks]
+      operationId: createDownloadUrl
+      summary: 다운로드 URL 재발급
+      description: 만료된 서명 URL을 대신할 새 URL을 받는다 (FE-111).
+      responses:
+        '201':
+          description: 발급됨
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [download_url, expires_at]
+                properties:
+                  download_url: { type: string, format: uri }
+                  expires_at: { type: string, format: date-time }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  parameters:
+    projectId: { name: projectId, in: path, required: true, schema: { type: string } }
+    sourceId: { name: sourceId, in: path, required: true, schema: { type: string } }
+    jobId: { name: jobId, in: path, required: true, schema: { type: string } }
+    revisionId: { name: revisionId, in: path, required: true, schema: { type: string } }
+
+  responses:
+    Unauthorized:
+      description: 인증 필요
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NotFound:
+      description: 없거나 접근할 수 없다
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    TooLarge:
+      description: 파일이 너무 크다
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ValidationFailed:
+      description: 서버 검증 실패. field로 입력 칸과 연결한다
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+  schemas:
+    Page:
+      type: object
+      required: [has_more]
+      properties:
+        has_more: { type: boolean }
+        next_cursor: { type: [string, 'null'] }
+
+    Error:
+      type: object
+      required: [code, message, retryable, request_id]
+      description: |
+        code는 검토서 §3.3의 카탈로그를 따른다.
+        모르는 code를 받아도 앱이 멈추지 않고 "확인 필요"로 표시한다 (PRD §17.3).
+      properties:
+        code: { $ref: '#/components/schemas/ErrorCode' }
+        message: { type: string, description: 서버 원문. 화면에는 프론트의 문구 표를 쓴다 }
+        retryable: { type: boolean }
+        request_id: { type: string }
+        field: { type: [string, 'null'], description: 422일 때 입력 칸 이름 }
+        retry_after_seconds: { type: [integer, 'null'], description: 429일 때 }
+
+    ErrorCode:
+      type: string
+      enum:
+        - FILE_TOO_LARGE
+        - FILE_TYPE_UNSUPPORTED
+        - FILE_ENCRYPTED
+        - FILE_CORRUPTED
+        - SCAN_FAILED
+        - PARSE_FAILED
+        - OCR_UNAVAILABLE
+        - QUOTA_EXCEEDED
+        - INSUFFICIENT_EVIDENCE
+        - GENERATION_TIMEOUT
+        - AI_PROVIDER_ERROR
+        - VALIDATION_FAILED
+        - RATE_LIMITED
+
+    ProjectStatus:
+      type: string
+      description: 서버 상태 9종. 사용자에게는 5종으로 압축해 보여준다 (검토서 §5)
+      enum: [created, uploading, parsing, extracting, analyzing, planning, generating, validating, repairing, completed, failed, deleting]
+
+    ProjectCreate:
+      type: object
+      required: [company_name, purpose]
+      properties:
+        company_name: { type: string, minLength: 1, maxLength: 100 }
+        industry: { type: [string, 'null'], maxLength: 100 }
+        purpose: { type: string, maxLength: 100 }
+        period_start: { type: [string, 'null'], format: date }
+        period_end: { type: [string, 'null'], format: date }
+        audiences: { type: array, items: { type: string } }
+
+    ProjectSummary:
+      type: object
+      required: [id, company_name, purpose, status, updated_at, source_count]
+      properties:
+        id: { type: string }
+        company_name: { type: string }
+        purpose: { type: string }
+        status: { $ref: '#/components/schemas/ProjectStatus' }
+        updated_at: { type: string, format: date-time }
+        source_count: { type: integer }
+        latest_revision: { $ref: '#/components/schemas/DeckRevisionSummary' }
+        last_error: { $ref: '#/components/schemas/Error' }
+
+    Project:
+      allOf:
+        - $ref: '#/components/schemas/ProjectSummary'
+        - type: object
+          required: [created_at, current_step]
+          properties:
+            industry: { type: [string, 'null'] }
+            period_start: { type: [string, 'null'], format: date }
+            period_end: { type: [string, 'null'], format: date }
+            audiences: { type: array, items: { type: string } }
+            created_at: { type: string, format: date-time }
+            current_step:
+              type: string
+              description: 직접 URL로 들어와도 올바른 화면으로 보내는 데 쓴다 (PRD §7)
+              enum: [basics, sources, review, generate, job, deck]
+            active_job_id: { type: [string, 'null'] }
+
+    Quota:
+      type: object
+      required: [file_count, file_limit, used_bytes, byte_limit]
+      description: 값은 검토서 §3.1에서 확정했다
+      properties:
+        file_count: { type: integer }
+        file_limit: { type: integer, examples: [20] }
+        used_bytes: { type: integer }
+        byte_limit: { type: integer, examples: [209715200] }
+
+    SourceStatus:
+      type: string
+      enum: [pending, uploading, scanning, parsing, ocr_queued, ready, failed]
+
+    SourceAsset:
+      type: object
+      required: [id, kind, status, created_at]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [file, text] }
+        filename: { type: [string, 'null'] }
+        size_bytes: { type: [integer, 'null'] }
+        content_type: { type: [string, 'null'] }
+        status: { $ref: '#/components/schemas/SourceStatus' }
+        progress: { type: [number, 'null'], minimum: 0, maximum: 1 }
+        fact_count: { type: [integer, 'null'] }
+        page_count: { type: [integer, 'null'] }
+        char_count: { type: [integer, 'null'], description: kind=text일 때 }
+        duplicate_of: { type: [string, 'null'], description: 중복 감지 (FE-035) }
+        error: { $ref: '#/components/schemas/Error' }
+        created_at: { type: string, format: date-time }
+
+    EvidenceGrade:
+      type: string
+      description: 방주 색단의 등급. docs/DESIGN.md §2
+      enum: [fact, interpretation, estimate]
+
+    Confidence:
+      type: string
+      enum: [high, medium, low]
+
+    Evidence:
+      type: object
+      required: [id, grade, statement, sources]
+      properties:
+        id: { type: string }
+        grade: { $ref: '#/components/schemas/EvidenceGrade' }
+        statement: { type: string, description: 추출 텍스트. 인용으로만 렌더링한다 (검토서 SEC-001) }
+        note: { type: [string, 'null'], description: 해석·추정일 때 근거 설명 }
+        confidence: { $ref: '#/components/schemas/Confidence' }
+        sources: { type: array, items: { $ref: '#/components/schemas/EvidenceRef' } }
+
+    EvidenceRef:
+      type: object
+      required: [source_id, footnote_number]
+      properties:
+        source_id: { type: string }
+        footnote_number: { type: integer, description: 본문 상첨자 번호 }
+        filename: { type: [string, 'null'] }
+        locator: { type: [string, 'null'], description: '8페이지, 매출 시트 B12 같은 위치' }
+        excerpt: { type: [string, 'null'], maxLength: 500, description: 제어문자를 제거한 발췌 (SEC-004) }
+        checked_at: { type: [string, 'null'], format: date }
+
+    EvidenceGap:
+      type: object
+      required: [id, topic, message]
+      properties:
+        id: { type: string }
+        topic: { type: string, examples: ['해외 상시 유통'] }
+        message: { type: string, description: 부족한 정보명과 결과에 생기는 제한 }
+        suggested_action: { type: [string, 'null'] }
+        affects_slides: { type: array, items: { type: integer } }
+
+    EvidenceConflict:
+      type: object
+      required: [id, metric, candidates, resolved]
+      properties:
+        id: { type: string }
+        metric: { type: string, examples: ['2024년 매출'] }
+        candidates:
+          type: array
+          minItems: 2
+          items:
+            type: object
+            required: [id, value_text, source]
+            properties:
+              id: { type: string }
+              value_text: { type: string }
+              source: { $ref: '#/components/schemas/EvidenceRef' }
+        resolved: { type: boolean }
+        chosen_candidate_id: { type: [string, 'null'] }
+
+    EvidenceSummary:
+      type: object
+      required: [company, counts, items, gaps, conflicts, sources]
+      properties:
+        company:
+          type: object
+          properties:
+            name: { type: string }
+            industry: { type: [string, 'null'] }
+            founded: { type: [string, 'null'] }
+            period_start: { type: [string, 'null'], format: date }
+            period_end: { type: [string, 'null'], format: date }
+        counts:
+          type: object
+          required: [sources_total, sources_ready, facts, needs_review]
+          properties:
+            sources_total: { type: integer }
+            sources_ready: { type: integer }
+            facts: { type: integer }
+            needs_review: { type: integer }
+        items: { type: array, items: { $ref: '#/components/schemas/Evidence' } }
+        gaps: { type: array, items: { $ref: '#/components/schemas/EvidenceGap' } }
+        conflicts: { type: array, items: { $ref: '#/components/schemas/EvidenceConflict' } }
+        sources: { type: array, items: { $ref: '#/components/schemas/EvidenceRef' } }
+
+    GenerationRequest:
+      type: object
+      required: [slide_count, language, outputs]
+      properties:
+        slide_count: { type: integer, default: 12, minimum: 8, maximum: 20 }
+        language: { type: string, default: ko }
+        outputs:
+          type: array
+          description: MVP는 pptx만. pdf는 Phase 2
+          items: { type: string, enum: [pptx] }
+        template: { type: string, default: default-ir }
+
+    JobStage:
+      type: string
+      description: 사용자 문구는 PRD §10.7 표를 따른다
+      enum: [scanning, parsing, extracting, analyzing, planning, generating, validating, repairing, completed, failed, cancelled]
+
+    Job:
+      type: object
+      required: [id, project_id, stage, progress, started_at, completed_stages]
+      properties:
+        id: { type: string }
+        project_id: { type: string }
+        stage: { $ref: '#/components/schemas/JobStage' }
+        progress: { type: number, minimum: 0, maximum: 1, description: 완료한 단계만 반영한다 }
+        started_at: { type: string, format: date-time }
+        finished_at: { type: [string, 'null'], format: date-time }
+        eta_seconds: { type: [integer, 'null'] }
+        completed_stages:
+          type: array
+          items:
+            type: object
+            required: [stage, finished_at]
+            properties:
+              stage: { $ref: '#/components/schemas/JobStage' }
+              finished_at: { type: string, format: date-time }
+              detail: { type: [string, 'null'] }
+        slides_done: { type: [integer, 'null'] }
+        slides_total: { type: [integer, 'null'] }
+        warnings: { type: array, items: { $ref: '#/components/schemas/JobWarning' } }
+        error: { $ref: '#/components/schemas/Error' }
+        revision_id: { type: [string, 'null'], description: 완료 시 결과 Revision }
+
+    JobWarning:
+      type: object
+      required: [code, message]
+      description: 경고는 오류와 다르게 표시한다 (PRD §5.4)
+      properties:
+        code: { type: string }
+        message: { type: string }
+        affects_slides: { type: array, items: { type: integer } }
+
+    DeckRevisionSummary:
+      type: object
+      required: [id, revision_number, slide_count, created_at]
+      properties:
+        id: { type: string }
+        revision_number: { type: integer }
+        slide_count: { type: integer }
+        created_at: { type: string, format: date-time }
+        artifacts: { type: array, items: { $ref: '#/components/schemas/Artifact' } }
+
+    DeckRevision:
+      allOf:
+        - $ref: '#/components/schemas/DeckRevisionSummary'
+        - type: object
+          required: [slides, totals]
+          properties:
+            slides: { type: array, items: { $ref: '#/components/schemas/Slide' } }
+            totals:
+              type: object
+              properties:
+                facts_used: { type: integer }
+                gaps: { type: integer }
+                estimates: { type: integer }
+
+    Slide:
+      type: object
+      required: [number, title, conclusion, evidence_refs]
+      properties:
+        number: { type: integer }
+        title: { type: string }
+        conclusion: { type: string, description: 한 장이 전달하는 하나의 결론 }
+        evidence_refs: { type: array, items: { $ref: '#/components/schemas/EvidenceRef' } }
+        grades: { type: array, items: { $ref: '#/components/schemas/EvidenceGrade' } }
+        gaps: { type: array, items: { $ref: '#/components/schemas/EvidenceGap' } }
+        warnings: { type: array, items: { $ref: '#/components/schemas/JobWarning' } }
+
+    SlidePreview:
+      type: object
+      required: [number, thumbnail_url, large_url, width, height]
+      properties:
+        number: { type: integer }
+        thumbnail_url: { type: string, format: uri, description: 320px 폭 }
+        large_url: { type: string, format: uri, description: 1600px 폭 }
+        width: { type: integer }
+        height: { type: integer }
+        alt: { type: string, description: 번호와 제목 (A11Y-008) }
+
+    Artifact:
+      type: object
+      required: [id, type, filename, size_bytes, created_at]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [pptx] }
+        filename: { type: string }
+        size_bytes: { type: integer }
+        checksum: { type: [string, 'null'] }
+        created_at: { type: string, format: date-time }
+        download_url: { type: [string, 'null'], format: uri, description: 만료되면 재발급받는다 }
+        expires_at: { type: [string, 'null'], format: date-time }

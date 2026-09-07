@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --paper: oklch(0.985 0.003 85);
+      --surface: oklch(1 0 0);
+      --ink: oklch(0.24 0.015 265);
+      --ink-muted: oklch(0.44 0.012 265);
+      --ink-faint: oklch(0.55 0.011 265);
+      --rule: oklch(0.89 0.006 265);
+      --rule-soft: oklch(0.94 0.004 265);
+      --seal: oklch(0.45 0.15 22);
+      --warn: oklch(0.55 0.11 70);
+      --ok: oklch(0.45 0.09 155);
+      --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-weight: 400; -webkit-font-smoothing: antialiased; }
+    a { color: var(--seal); text-decoration: none; }
+    a:hover { color: oklch(0.36 0.15 22); text-decoration: underline; }
+    .marg { text-align: right; font-size: 12px; line-height: 1.45; color: var(--ink-faint); letter-spacing: 0.02em; padding-top: 3px; }
+    .marg-fact { color: var(--ink-muted); font-weight: 500; }
+    .fn { font-family: var(--mono); font-size: 11px; color: var(--seal); vertical-align: super; line-height: 0; margin-left: 2px; font-weight: 500; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .btn-primary { font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--surface); background: var(--seal); border: 0; height: 40px; padding: 0 20px; cursor: pointer; }
+    .btn-quiet { font-family: var(--sans); font-size: 14px; font-weight: 400; color: var(--ink); background: transparent; border: 1px solid var(--rule); height: 40px; padding: 0 18px; cursor: pointer; }
+    .btn-sm { font-family: var(--sans); font-size: 12.5px; font-weight: 400; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); height: 30px; padding: 0 11px; cursor: pointer; }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; background: var(--paper);">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--rule);">
+    <div style="display: flex; align-items: baseline; gap: 22px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em;">[서비스명]</span>
+      <span style="font-size: 13px; color: var(--ink-muted);">샘플웨이브</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <span style="font-size: 13px; color: var(--ink-muted);">도움말</span>
+      <div style="width: 27px; height: 27px; border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--ink-muted);">권</div>
+    </div>
+  </div>
+
+  <div style="padding: 46px 40px 56px; max-width: 812px;">
+
+    <h1 style="margin: 0 0 7px; font-size: 26px; font-weight: 600; letter-spacing: -0.015em;">슬라이드를 만들고 있습니다</h1>
+    <p style="margin: 0 0 32px; font-size: 15px; line-height: 1.62; color: var(--ink-muted); max-width: 60ch;">이 창을 닫아도 계속 만듭니다. 끝나면 이 화면으로 돌아와 결과를 볼 수 있습니다.</p>
+
+    <!-- 진행 -->
+    <div style="border-top: 1px solid var(--ink); padding-top: 15px; margin-bottom: 34px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px;">
+        <span style="font-size: 15px; font-weight: 500;">여섯째 단계 · 슬라이드 제작</span>
+        <span style="font-size: 13px; color: var(--ink-muted);"><span class="num">6</span> / <span class="num">8</span>단계 지남</span>
+      </div>
+      <div style="height: 4px; background: var(--rule-soft);">
+        <div style="width: 68%; height: 100%; background: var(--seal);"></div>
+      </div>
+      <div style="margin-top: 9px; font-size: 12.5px; color: var(--ink-faint);"><span class="num">4</span>분 <span class="num">12</span>초 지났습니다. 보통 <span class="num">4</span>분에서 <span class="num">7</span>분 걸립니다.</div>
+    </div>
+
+    <!-- 단계 목록: 방주에 완료 시각 -->
+    <div style="display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 0 24px;">
+
+      <div class="marg num" style="padding-top: 13px;">0:04</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok); flex-shrink: 0;"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+        <span style="font-size: 14.5px; color: var(--ink-muted);">파일이 안전한지 확인했습니다</span>
+      </div>
+
+      <div class="marg num" style="padding-top: 13px;">0:38</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok); flex-shrink: 0;"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+        <span style="font-size: 14.5px; color: var(--ink-muted);">문서와 표를 읽었습니다</span>
+      </div>
+
+      <div class="marg num" style="padding-top: 13px;">1:26</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok); flex-shrink: 0;"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+        <span style="font-size: 14.5px; color: var(--ink-muted);">사건과 수치 <span class="num">28</span>건을 찾았습니다</span>
+      </div>
+
+      <div class="marg num" style="padding-top: 13px;">2:31</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok); flex-shrink: 0;"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+        <span style="font-size: 14.5px; color: var(--ink-muted);">성장 구조와 사업 모델을 분석했습니다</span>
+      </div>
+
+      <div class="marg num" style="padding-top: 13px;">3:19</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" style="color: var(--ok); flex-shrink: 0;"><path d="M4 10.5 L8 14.5 L16 6"/></svg>
+        <span style="font-size: 14.5px; color: var(--ink-muted);"><span class="num">12</span>장의 이야기 순서를 만들었습니다</span>
+      </div>
+
+      <div class="marg" style="padding-top: 14px; color: var(--seal); font-weight: 500;">지금</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid var(--rule-soft); border-top: 1px solid var(--rule);">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" style="color: var(--seal); flex-shrink: 0;"><circle cx="10" cy="10" r="7.5" stroke-opacity="0.26"/><path d="M10 2.5 A7.5 7.5 0 0 1 17.5 10"/></svg>
+        <span style="font-size: 15px; font-weight: 500;">슬라이드를 만들고 있습니다</span>
+        <span class="num" style="margin-left: auto; font-size: 13px; color: var(--ink-muted);">8 / 12장</span>
+      </div>
+
+      <div class="marg" style="padding-top: 13px; color: var(--ink-faint);">대기</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div style="width: 14px; height: 14px; border: 1px solid var(--rule); flex-shrink: 0;"></div>
+        <span style="font-size: 14.5px; color: var(--ink-faint);">글자와 도형이 잘 보이는지 확인합니다</span>
+      </div>
+
+      <div class="marg" style="padding-top: 13px; color: var(--ink-faint);">대기</div>
+      <div style="display: flex; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft);">
+        <div style="width: 14px; height: 14px; border: 1px solid var(--rule); flex-shrink: 0;"></div>
+        <span style="font-size: 14.5px; color: var(--ink-faint);">찾은 문제를 고칩니다</span>
+      </div>
+
+      <!-- 경고 -->
+      <div class="marg" style="padding-top: 30px; color: var(--warn); font-weight: 500;">자료 부족</div>
+      <div style="padding: 28px 0 0;">
+        <div style="border-top: 1px solid var(--ink); padding-top: 14px;">
+          <div style="font-size: 14.5px; line-height: 1.6; margin-bottom: 7px;">해외 진출은 단기 시장 테스트로 표현합니다</div>
+          <div style="font-size: 13.5px; line-height: 1.66; color: var(--ink-muted); max-width: 58ch;">상시 유통을 확인할 자료가 없어 <span class="num">9</span>번 슬라이드는 도쿄 팝업 한 건만 다룹니다. 만든 뒤에 계약서나 정산 자료를 올려 다시 만들 수 있습니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--rule);">
+      <button class="btn-quiet">내 자료 목록으로</button>
+      <button class="btn-sm" style="height: 40px; border-color: transparent; background: transparent; color: var(--ink-muted); padding-left: 0;">만들기 멈추기</button>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

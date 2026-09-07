@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   디자인 토큰 — 시각 SSOT는 docs/DESIGN.md
+   기본 팔레트를 끄고 이 프로젝트의 색만 남긴다.
+   임의 색을 쓰지 못하게 하는 것이 목적이므로 되살리지 않는다.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-*: initial;
+
+  /* 필수 키워드 */
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* 지면 */
+  --color-paper: oklch(0.985 0.003 85);
+  --color-surface: oklch(1 0 0);
+
+  /* 잉크 — 종이 배경 대비비를 주석에 적어둔다. 값을 바꾸면 다시 재야 한다 */
+  --color-ink: oklch(0.24 0.015 265);         /* 15.76:1 */
+  --color-ink-muted: oklch(0.44 0.012 265);   /*  7.44:1 */
+  --color-ink-faint: oklch(0.55 0.011 265);   /*  4.65:1 — AA 하한. 더 밝히면 위반 */
+
+  /* 괘선 — 텍스트가 아니므로 대비 하한을 적용하지 않는다 */
+  --color-rule: oklch(0.89 0.006 265);
+  --color-rule-soft: oklch(0.94 0.004 265);
+
+  /* 검인 — 주요 행동과 각주 번호에만 */
+  --color-seal: oklch(0.45 0.15 22);          /*  7.71:1 */
+  --color-seal-deep: oklch(0.36 0.15 22);     /* hover */
+
+  /* 상태 — 반드시 아이콘이나 라벨과 함께 쓴다 (A11Y-009) */
+  --color-warn: oklch(0.55 0.11 70);          /*  4.76:1 */
+  --color-danger: oklch(0.52 0.17 27);
+  --color-ok: oklch(0.45 0.09 155);           /*  6.81:1 */
+
+  /* 포커스 — 검인과 구분되는 계열 */
+  --color-focus: oklch(0.52 0.16 258);
+
+  /* 활자 */
+  --font-sans: var(--font-plex-kr), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: var(--font-plex-mono), "SFMono-Regular", Menlo, monospace;
+
+  /* 타입 램프 — 하한은 PRD §12.3 (본문 16px+, 보조 14px+, 페이지 제목 28px+) */
+  --text-*: initial;
+  --text-note: 0.75rem;      /* 12px — 각주·캡션·방주 라벨 */
+  --text-note--line-height: 1.5;
+  --text-small: 0.875rem;    /* 14px — 보조 본문 하한 */
+  --text-small--line-height: 1.6;
+  --text-body: 1rem;         /* 16px — 기본 본문 하한 */
+  --text-body--line-height: 1.65;
+  --text-lead: 1.125rem;     /* 18px — 도입 문단 */
+  --text-lead--line-height: 1.6;
+  --text-section: 1.25rem;   /* 20px — 섹션 제목 */
+  --text-section--line-height: 1.4;
+  --text-title: 1.75rem;     /* 28px — 페이지 제목 하한 */
+  --text-title--line-height: 1.28;
+  --text-figure: 2.125rem;   /* 34px — 큰 수치 */
+  --text-figure--line-height: 1.15;
+
+  /* 간격 — 4px 격자 */
+  --spacing: 4px;
+
+  /* 폭 */
+  --container-work: 1200px;   /* 주요 작업 영역 */
+  --container-wide: 1440px;   /* 결과 화면 */
+  --container-read: 62ch;     /* 읽는 문단. 80자 미만 유지 */
+
+  /* 방주 색단 — 이 설계의 핵심 장치. 폭이 바뀌면 전 화면 정렬이 깨진다 */
+  --gutter: 92px;
+  --gutter-gap: 24px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   기반 스타일
+   ───────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    background: var(--color-paper);
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  /* 숫자는 자리폭을 고정해 표에서 흔들리지 않게 한다 */
+  .tnum {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  a {
+    color: var(--color-seal);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--color-seal-deep);
+    text-decoration: underline;
+  }
+
+  /* 키보드 포커스는 항상 보인다 (A11Y-002) */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* 모션 감소 설정을 따른다 (A11Y-010) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   방주 색단 — 근거 등급을 색이 아니라 위치와 활자로 표시한다
+   ───────────────────────────────────────────────────────────── */
+@layer components {
+  /* 방주 + 본문 2열 격자. 자식을 (라벨, 내용) 쌍으로 넣는다 */
+  .marginalia {
+    display: grid;
+    grid-template-columns: var(--gutter) minmax(0, 1fr);
+    gap: 0 var(--gutter-gap);
+  }
+
+  /* 색단의 라벨 */
+  .marg {
+    padding-top: 3px;
+    font-size: var(--text-note);
+    line-height: 1.45;
+    letter-spacing: 0.02em;
+    color: var(--color-ink-faint);
+    text-align: right;
+  }
+
+  /* 자료에 직접 적혀 있음 */
+  .marg-fact {
+    font-weight: 500;
+    color: var(--color-ink-muted);
+  }
+
+  /* 확인이 필요함 */
+  .marg-warn {
+    font-weight: 500;
+    color: var(--color-warn);
+  }
+
+  /* 확인할 자료가 없음 — [ ] 로 표시 */
+  .marg-missing {
+    font-family: var(--font-mono);
+    color: var(--color-ink-faint);
+  }
+
+  /* 가정이 들어간 추정. 사선 배경으로 본문과 구분한다 */
+  .estimate {
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent 0 7px,
+      oklch(0.955 0.004 265) 7px 8px
+    );
+  }
+
+  /* 출처 각주 번호 */
+  .footnote {
+    margin-left: 2px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem; /* 11px — 상첨자 번호. 검인색이라 7.71:1 */
+    font-weight: 500;
+    line-height: 0;
+    color: var(--color-seal);
+    vertical-align: super;
+  }
+}
