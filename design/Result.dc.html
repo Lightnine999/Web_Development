@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    /* docs/DESIGN.md 와 src/app/globals.css 의 @theme 값을 그대로 옮긴 것.
+       한쪽을 바꾸면 다른 쪽도 바꾼다. */
+    :root {
+      --paper: oklch(0.985 0.003 85);
+      --surface: oklch(1 0 0);
+      --ink: oklch(0.24 0.015 265);
+      --ink-muted: oklch(0.44 0.012 265);
+      --ink-faint: oklch(0.55 0.011 265);
+      --rule: oklch(0.89 0.006 265);
+      --rule-soft: oklch(0.94 0.004 265);
+      --seal: oklch(0.45 0.15 22);
+      --seal-deep: oklch(0.36 0.15 22);
+      --warn: oklch(0.55 0.11 70);
+      --danger: oklch(0.52 0.17 27);
+      --ok: oklch(0.45 0.09 155);
+      --focus: oklch(0.52 0.16 258);
+      --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      --mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+      --work: 1200px;
+      --read: 62ch;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    a { color: var(--seal); text-decoration: none; }
+    a:hover { color: var(--seal-deep); text-decoration: underline; }
+
+    /* 타입 램프 */
+    .t-title { font-size: 28px; line-height: 1.28; font-weight: 600; letter-spacing: -0.015em; margin: 0; }
+    .t-section { font-size: 20px; line-height: 1.4; font-weight: 600; margin: 0; }
+    .t-body { font-size: 16px; line-height: 1.65; }
+    .t-small { font-size: 14px; line-height: 1.6; }
+    .t-note { font-size: 12px; line-height: 1.5; }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+    /* 실제 코드의 컨트롤 크기 (h-11 = 44px, h-10 = 40px) */
+    .field { height: 44px; border: 1px solid var(--rule); background: var(--surface); padding: 0 12px; font-family: var(--sans); font-size: 16px; color: var(--ink); width: 100%; }
+    .area { border: 1px solid var(--rule); background: var(--surface); padding: 12px; font-family: var(--sans); font-size: 16px; line-height: 1.65; width: 100%; }
+    .btn-submit { height: 44px; width: 100%; border: 0; background: var(--seal); color: var(--surface); font-family: var(--sans); font-size: 14px; font-weight: 500; cursor: pointer; }
+    .tab { height: 40px; padding: 0 16px; border: 0; background: transparent; font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--ink-muted); cursor: pointer; }
+    .tab-on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--seal); }
+
+    /* 선택 카드 — 입력 방식을 탭이 아니라 카드로 고른다 */
+    .pick { border: 1px solid var(--rule); background: var(--surface); padding: 20px; cursor: pointer; text-align: left; font-family: var(--sans); width: 100%; }
+    .pick-on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+    .btn-ghost { height: 40px; padding: 0 16px; border: 1px solid var(--rule); background: var(--surface); font-family: var(--sans); font-size: 14px; color: var(--ink); cursor: pointer; }
+    .chip { display: inline-block; padding: 3px 8px; border: 1px solid var(--rule); font-size: 12px; color: var(--ink-muted); }
+    .thumb { aspect-ratio: 16 / 9; background: oklch(0.972 0.004 90); border: 1px solid var(--rule); position: relative; }
+    .lbl { font-size: 14px; line-height: 1.6; color: var(--ink-muted); }
+  </style>
+</helmet>
+
+<div style="min-height: 100%; background: var(--paper);">
+  <div style="display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 28px; background: var(--surface); border-bottom: 1px solid var(--rule);">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <span style="font-size: 15px; font-weight: 600; letter-spacing: -0.01em;">[서비스명]</span>
+      <span style="width: 1px; height: 14px; background: var(--rule);"></span>
+      <button style="border: 0; background: transparent; font-family: var(--sans); font-size: 13px; color: var(--ink-muted); cursor: pointer; padding: 0;">내 자료로</button>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span class="t-note" style="color: var(--ink-faint);"><span class="num">9</span>월 <span class="num">8</span>일 <span class="num">14:52</span> 만듦</span>
+      <button class="btn-submit" style="width: auto; padding: 0 20px; height: 38px;">PPTX 다운로드</button>
+    </div>
+  </div>
+
+  <div style="margin: 0 auto; width: 100%; max-width: 1120px; padding: 36px 28px 64px;">
+
+    <!-- 결과 요약: 무엇이 만들어졌고 무엇이 부족한지 -->
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 10px;">
+      <div>
+        <h1 class="t-title" style="margin: 0 0 6px;">샘플웨이브 IR 자료</h1>
+        <div class="t-small" style="color: var(--ink-muted);"><span class="num">12</span>장 · <span class="num">3.8MB</span></div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn-ghost" style="height: 34px; font-size: 13px;">전체 화면</button>
+        <button class="btn-ghost" style="height: 34px; font-size: 13px;">다시 만들기</button>
+      </div>
+    </div>
+
+    <div class="marginalia" style="margin: 22px 0 30px; grid-template-columns: 78px minmax(0,1fr); gap: 0 18px; max-width: 720px;">
+      <div class="marg marg-fact">사실</div>
+      <div style="padding: 10px 0; border-bottom: 1px solid var(--rule-soft);" class="t-small"><span class="num">28</span>건이 <span class="num">12</span>장에 쓰였습니다</div>
+      <div class="marg marg-missing">[ ]</div>
+      <div style="padding: 10px 0; border-bottom: 1px solid var(--rule-soft);" class="t-small"><span class="num">9</span>번 슬라이드 — 해외 상시 유통 자료가 없어 단기 시장 테스트로 표현했습니다</div>
+      <div class="marg">추정</div>
+      <div style="padding: 10px 0;" class="t-small"><span class="num">12</span>번 슬라이드 — 가치 시나리오. 공식 감정가가 아닙니다</div>
+    </div>
+
+    <!-- 미리보기: 큰 화면 + 썸네일 그리드 -->
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 24px; align-items: start;">
+
+      <div>
+        <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px;">
+          <span class="t-note" style="color: var(--ink-faint);"><span class="num">9</span> / <span class="num">12</span> · 해외 진출</span>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-ghost" style="height: 28px; width: 30px; padding: 0; font-size: 13px;">‹</button>
+            <button class="btn-ghost" style="height: 28px; width: 30px; padding: 0; font-size: 13px;">›</button>
+          </div>
+        </div>
+
+        <!-- 슬라이드 지면은 IR 자료의 색(네이비·그린·옐로)을 쓴다. 웹 UI 팔레트와 분리 -->
+        <div style="aspect-ratio: 16 / 9; background: oklch(0.972 0.004 90); border: 1px solid var(--rule); padding: 38px 42px; display: flex; flex-direction: column;">
+          <div style="font-size: 22px; font-weight: 600; color: oklch(0.28 0.06 250); letter-spacing: -0.02em; margin-bottom: 5px;">해외 수요는 확인됐고, 상시 유통은 아직이다</div>
+          <div style="width: 42px; height: 3px; background: oklch(0.82 0.13 90); margin-bottom: 26px;"></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); flex-grow: 1;">
+            <div style="border-top: 3px solid oklch(0.55 0.1 160); padding: 13px 18px 0 0;">
+              <div style="font-size: 11px; color: oklch(0.55 0.1 160); font-weight: 600; margin-bottom: 7px;">확인됨</div>
+              <div style="font-size: 14px; font-weight: 600; color: oklch(0.28 0.06 250); line-height: 1.4;">온라인 반응</div>
+              <div style="font-size: 12px; line-height: 1.55; color: oklch(0.42 0.02 250); margin-top: 5px;">일본 리셀 게시글 <span class="num">340</span>건</div>
+            </div>
+            <div style="border-top: 3px solid oklch(0.55 0.1 160); padding: 13px 18px 0; border-left: 1px solid oklch(0.88 0.006 250);">
+              <div style="font-size: 11px; color: oklch(0.55 0.1 160); font-weight: 600; margin-bottom: 7px;">확인됨</div>
+              <div style="font-size: 14px; font-weight: 600; color: oklch(0.28 0.06 250); line-height: 1.4;">단기 팝업 <span class="num">1</span>회</div>
+              <div style="font-size: 12px; line-height: 1.55; color: oklch(0.42 0.02 250); margin-top: 5px;"><span class="num">2025</span>년 <span class="num">6</span>월 도쿄</div>
+            </div>
+            <div style="border-top: 3px dashed oklch(0.72 0.02 250); padding: 13px 0 0 18px; border-left: 1px solid oklch(0.88 0.006 250); background: repeating-linear-gradient(-45deg, transparent 0 8px, oklch(0.945 0.004 250) 8px 9px);">
+              <div style="font-size: 11px; color: oklch(0.55 0.02 250); font-weight: 600; margin-bottom: 7px;">확인되지 않음</div>
+              <div style="font-size: 14px; font-weight: 600; color: oklch(0.55 0.02 250); line-height: 1.4;">상시 유통</div>
+              <div style="font-size: 12px; line-height: 1.55; color: oklch(0.55 0.02 250); margin-top: 5px;">공개 자료로 확인되지 않음</div>
+            </div>
+          </div>
+          <div style="margin-top: 20px; padding-top: 11px; border-top: 1px solid oklch(0.88 0.006 250); font-size: 11px; color: oklch(0.5 0.02 250);">행사 <span class="num">1</span>회를 시장 안착으로 보지 않습니다.</div>
+        </div>
+
+        <!-- 이 슬라이드의 근거 -->
+        <div style="margin-top: 14px; border: 1px solid var(--rule); background: var(--surface); padding: 14px 16px;">
+          <div class="t-note" style="color: var(--ink-faint); margin-bottom: 8px;">이 장이 쓴 근거</div>
+          <div style="border-left: 2px solid var(--rule); padding-left: 12px;" class="t-small">
+            도쿄 시부야 팝업 <span class="num">2025</span>.<span class="num">06</span>.<span class="num">12</span> ~ <span class="num">06</span>.<span class="num">25</span>, 방문 <span class="num">4,180</span>명
+            <div class="t-note" style="color: var(--ink-faint); margin-top: 4px;">붙여넣은 텍스트 · <span class="num">7</span>번째 문단</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 썸네일 그리드 -->
+      <div>
+        <div class="t-note" style="color: var(--ink-faint); margin-bottom: 10px;">슬라이드 <span class="num">12</span>장</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="thumb" style="background: oklch(0.28 0.06 250);"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: oklch(1 0 0 / 0.7);">01</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">02</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">03</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">04</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">05</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">06</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">07</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">08</span></div>
+          <div class="thumb" style="border: 1.5px solid var(--seal); outline: 2px solid oklch(0.45 0.15 22 / 0.14);"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--seal); font-weight: 500;">09</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">10</span></div>
+          <div class="thumb"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">11</span></div>
+          <div class="thumb" style="background: repeating-linear-gradient(-45deg, oklch(0.972 0.004 90) 0 8px, oklch(0.94 0.004 250) 8px 9px);"><span class="num" style="position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: var(--ink-faint);">12</span></div>
+        </div>
+        <div class="t-note" style="margin-top: 10px; color: var(--ink-faint); line-height: 1.55;"><span class="num">12</span>번은 추정이 들어간 장이라 사선으로 표시했습니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

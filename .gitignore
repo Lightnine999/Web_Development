@@ -52,3 +52,7 @@ next-env.d.ts
 # Claude Design seed 산출물 — 에디터 코드 2.4MB. design/*.dc.html 로 재생성한다
 /design/ir-generator-screens.html
 /design/_tokens.txt
+
+# 캔버스 중간 조립 파일 (_head.html + _b_*.html 로 .dc.html 을 만든다)
+/design/_b_*.html
+.omc/

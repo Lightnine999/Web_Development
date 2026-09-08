@@ -85,30 +85,44 @@
     <!-- 입력 방식을 탭이 아니라 카드로 고르게 한다. 무엇을 넣는 자리인지 카드 안에서 설명한다 -->
     <div class="t-note" style="color: var(--ink-faint); margin-bottom: 10px;">자료를 넣는 방법</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px;">
-      <button class="pick pick-on">
+      <button class="pick">
         <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 8px;">
-          <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="color: var(--seal);"><path d="M4 4.5 H16"/><path d="M4 8.5 H16"/><path d="M4 12.5 H11"/></svg>
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="color: var(--ink-faint);"><path d="M4 4.5 H16"/><path d="M4 8.5 H16"/><path d="M4 12.5 H11"/></svg>
           <span style="font-size: 15px; font-weight: 600;">텍스트 붙여넣기</span>
         </div>
         <div class="t-small" style="color: var(--ink-muted); line-height: 1.55;">연혁, 실적, 사업 모델을 그대로 붙여넣으세요. 최대 <span class="num">30,000</span>자.</div>
       </button>
-      <button class="pick">
+      <button class="pick pick-on">
         <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 8px;">
-          <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="color: var(--ink-faint);"><path d="M5 2.5 H12 L16 6.5 V17.5 H5 Z"/><path d="M12 2.5 V6.5 H16"/></svg>
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" style="color: var(--seal);"><path d="M5 2.5 H12 L16 6.5 V17.5 H5 Z"/><path d="M12 2.5 V6.5 H16"/></svg>
           <span style="font-size: 15px; font-weight: 600;">PDF 올리기</span>
         </div>
         <div class="t-small" style="color: var(--ink-muted); line-height: 1.55;">회사소개서나 IR 자료를 그대로. 최대 <span class="num">10MB</span>.</div>
       </button>
     </div>
 
-    <!-- 텍스트 입력 -->
-    <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 28px;">
-      <div style="display: flex; align-items: baseline; justify-content: space-between;">
-        <span class="lbl">회사 정보</span>
-        <span class="t-note num" style="color: var(--ink-faint);">9,803 / 30,000</span>
+    <!-- PDF 업로드: 올린 뒤 무엇이 읽혔는지 보여준다 -->
+    <div style="margin-bottom: 28px;">
+      <div class="lbl" style="margin-bottom: 6px;">PDF 파일</div>
+      <div style="border: 1px solid var(--rule); background: var(--surface);">
+        <div style="display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 15px 16px;">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" style="color: var(--seal);"><path d="M5 2.5 H12 L16 6.5 V17.5 H5 Z"/><path d="M12 2.5 V6.5 H16"/></svg>
+          <div>
+            <div style="font-size: 15px; margin-bottom: 3px;">샘플웨이브_회사소개서.pdf</div>
+            <div class="t-note" style="color: var(--ink-faint);"><span class="num">4.2MB</span> · <span class="num">31</span>페이지에서 글자 <span class="num">17,720</span>자를 읽었습니다</div>
+          </div>
+          <button class="btn-ghost" style="height: 32px; font-size: 13px;">바꾸기</button>
+        </div>
+        <div style="padding: 0 16px 15px 66px;">
+          <div class="marginalia" style="grid-template-columns: 64px minmax(0,1fr); gap: 0 14px;">
+            <div class="marg marg-fact" style="padding-top: 0;">읽음</div>
+            <div class="t-small" style="color: var(--ink-muted); line-height: 1.6;">연혁, 제품 라인, 분기 실적, 협업 이력</div>
+            <div class="marg marg-missing" style="padding-top: 8px;">[ ]</div>
+            <div class="t-small" style="padding-top: 8px; color: var(--ink-muted); line-height: 1.6;">이미지로만 된 페이지 <span class="num">3</span>장은 글자를 읽지 못했습니다</div>
+          </div>
+        </div>
       </div>
-      <div class="area" style="min-height: 240px;">2019년 3월 두 명이 시작했고, 첫 제품은 주방 수납함이었습니다. 2023년 9월 편의점 체인 1,240개 점포에 입점하면서 매출이 크게 올랐습니다. 2024년 매출은 17억원으로 전년 대비 62% 늘었고, 2025년 6월 도쿄에서 2주 팝업을 열어 4,180명이 방문했습니다. 해외 상시 유통 계약은 아직 없습니다.</div>
-      <div class="t-note" style="color: var(--ink-faint); line-height: 1.55;">연혁과 수치를 함께 적으면 성장 전환점을 더 정확히 찾습니다.</div>
+      <div class="t-note" style="margin-top: 7px; color: var(--ink-faint); line-height: 1.55;">스캔한 이미지 PDF는 글자를 읽을 수 없습니다. 그때는 텍스트로 붙여넣어 주세요.</div>
     </div>
     <div style="display: flex; align-items: center; gap: 12px; padding-top: 24px; border-top: 1px solid var(--rule);">
       <button class="btn-submit" style="width: auto; padding: 0 24px;">12장 만들기</button>
