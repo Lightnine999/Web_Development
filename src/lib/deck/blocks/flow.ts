@@ -1,20 +1,19 @@
 import type PptxGenJS from "pptxgenjs";
 import { CONTENT, FONT, SLIDE } from "../theme";
-import type { Slide as SlideData } from "../schema";
-
-type FlowSlide = Extract<SlideData, { visualType: "flow" }>;
+import type { Slide } from "../schema";
 
 const GAP = 0.35;
 const ARROW_W = 0.25;
 
-/** 좌→우 단계 흐름 — 3~4단, 박스 사이를 화살표로 연결. */
-export function drawFlow(slide: PptxGenJS.Slide, data: FlowSlide) {
-  const n = data.steps.length;
+/** 좌→우 단계 흐름 — 3~4단, 박스 사이를 화살표로 연결. visualType이 flow일 때만 호출된다. */
+export function drawFlow(slide: PptxGenJS.Slide, data: Slide) {
+  const steps = data.flowSteps!;
+  const n = steps.length;
   const boxW = (CONTENT.w - GAP * (n - 1)) / n;
   const boxH = CONTENT.h * 0.75;
   const boxY = CONTENT.y + (CONTENT.h - boxH) / 2;
 
-  data.steps.forEach((step, i) => {
+  steps.forEach((step, i) => {
     const x = CONTENT.x + i * (boxW + GAP);
 
     slide.addShape("roundRect", {

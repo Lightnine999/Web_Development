@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { extractPdfText } from "@/lib/pdf";
 import { GenerateInputSchema, MAX_PDF_BYTES } from "@/lib/deck/schema";
-import { generateSlidePlan } from "@/lib/deck/generate";
+import { CodexError, generateSlidePlan } from "@/lib/deck/generate";
 import { renderDeck } from "@/lib/deck/render";
 
+// generateSlidePlan이 로컬 Codex CLI를 서브프로세스로 호출한다 —
+// 이 라우트는 codex 바이너리가 설치·로그인된 이 컴퓨터에서만 동작하며,
+// Vercel 등 원격 배포 환경에는 codex가 없어 그대로 실패한다.
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 function errorResponse(code: string, message: string, status: number) {
   return NextResponse.json({ error: { code, message } }, { status });
@@ -79,8 +82,16 @@ export async function POST(request: Request) {
       parsedInput.data.sourceText,
     );
     pptxBuffer = await renderDeck(slidePlan);
-  } catch {
-    return errorResponse("AI_PROVIDER_ERROR", "자료 생성 중 오류가 발생했습니다", 502);
+  } catch (err) {
+    // Codex 실패는 종류마다 사용자가 할 수 있는 조치가 다르다.
+    // 코드를 그대로 넘겨 화면이 알맞은 안내를 고르게 한다.
+    if (err instanceof CodexError) {
+      const status = err.code === "CODEX_TIMEOUT" ? 504 : 502;
+      console.error("[generate]", err.message);
+      return errorResponse(err.code, "자료 생성에 실패했습니다", status);
+    }
+    console.error("[generate]", err);
+    return errorResponse("CODEX_FAILED", "자료 생성에 실패했습니다", 502);
   }
 
   const deckId = crypto.randomUUID();

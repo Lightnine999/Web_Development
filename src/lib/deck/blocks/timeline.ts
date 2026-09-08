@@ -1,15 +1,14 @@
 import type PptxGenJS from "pptxgenjs";
 import { CONTENT, FONT, SLIDE } from "../theme";
-import type { Slide as SlideData } from "../schema";
-
-type TimelineSlide = Extract<SlideData, { visualType: "timeline" }>;
+import type { Slide } from "../schema";
 
 const NODE_R = 0.09;
 const LINE_Y_RATIO = 0.35;
 
-/** 가로 타임라인 — 연도 노드 3~6개, 아래에 설명. */
-export function drawTimeline(slide: PptxGenJS.Slide, data: TimelineSlide) {
-  const n = data.items.length;
+/** 가로 타임라인 — 연도 노드 3~6개, 아래에 설명. visualType이 timeline일 때만 호출된다. */
+export function drawTimeline(slide: PptxGenJS.Slide, data: Slide) {
+  const items = data.timelineItems!;
+  const n = items.length;
   const lineY = CONTENT.y + CONTENT.h * LINE_Y_RATIO;
   const slotW = CONTENT.w / n;
 
@@ -21,7 +20,7 @@ export function drawTimeline(slide: PptxGenJS.Slide, data: TimelineSlide) {
     line: { color: SLIDE.line, width: 2 },
   });
 
-  data.items.forEach((item, i) => {
+  items.forEach((item, i) => {
     const cx = CONTENT.x + slotW * i + slotW / 2;
 
     slide.addShape("ellipse", {

@@ -1,18 +1,17 @@
 import type PptxGenJS from "pptxgenjs";
 import { CONTENT, FONT, SLIDE } from "../theme";
-import type { Slide as SlideData } from "../schema";
-
-type MetricsSlide = Extract<SlideData, { visualType: "metrics" }>;
+import type { Slide } from "../schema";
 
 const GAP = 0.3;
 
-/** 큰 숫자 타일 2~4개. */
-export function drawMetrics(slide: PptxGenJS.Slide, data: MetricsSlide) {
-  const n = data.items.length;
+/** 큰 숫자 타일 2~4개. visualType이 metrics일 때만 호출된다. */
+export function drawMetrics(slide: PptxGenJS.Slide, data: Slide) {
+  const items = data.metricsItems!;
+  const n = items.length;
   const tileW = (CONTENT.w - GAP * (n - 1)) / n;
   const tileH = CONTENT.h * 0.7;
 
-  data.items.forEach((item, i) => {
+  items.forEach((item, i) => {
     const x = CONTENT.x + i * (tileW + GAP);
 
     slide.addShape("rect", {

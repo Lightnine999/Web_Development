@@ -1,17 +1,16 @@
 import type PptxGenJS from "pptxgenjs";
 import { CONTENT, FONT, SLIDE } from "../theme";
-import type { Slide as SlideData } from "../schema";
-
-type CardsSlide = Extract<SlideData, { visualType: "cards" }>;
+import type { Slide } from "../schema";
 
 const GAP = 0.2;
 
-/** 카드 열 — 2~5개를 가로로 나란히. */
-export function drawCards(slide: PptxGenJS.Slide, data: CardsSlide) {
-  const n = data.items.length;
+/** 카드 열 — 2~5개를 가로로 나란히. visualType이 cards일 때만 호출되므로 cardsItems는 zod가 non-null을 보장한다. */
+export function drawCards(slide: PptxGenJS.Slide, data: Slide) {
+  const items = data.cardsItems!;
+  const n = items.length;
   const cardW = (CONTENT.w - GAP * (n - 1)) / n;
 
-  data.items.forEach((item, i) => {
+  items.forEach((item, i) => {
     const x = CONTENT.x + i * (cardW + GAP);
 
     slide.addShape("roundRect", {

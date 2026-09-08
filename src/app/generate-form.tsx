@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { MAX_INPUT_TEXT_CHARS } from "@/lib/deck/schema";
+import { describeError } from "@/lib/messages/errors";
 
 type Mode = "text" | "pdf";
 
@@ -13,13 +14,13 @@ export function GenerateForm() {
   const [sourceText, setSourceText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
+    setErrorCode(null);
     setDownloadUrl(null);
     setPending(true);
 
@@ -37,14 +38,14 @@ export function GenerateForm() {
       const body = await res.json();
 
       if (!res.ok) {
-        setError(body.error?.message ?? "생성에 실패했습니다");
+        setErrorCode(body.error?.code ?? null);
         return;
       }
 
       setDownloadUrl(body.downloadUrl);
       router.refresh();
     } catch {
-      setError("네트워크 오류가 발생했습니다");
+      setErrorCode("NETWORK");
     } finally {
       setPending(false);
     }
@@ -112,10 +113,15 @@ export function GenerateForm() {
         </label>
       )}
 
-      {error && (
-        <p className="text-small text-danger" role="alert">
-          {error}
-        </p>
+      {errorCode && (
+        <div role="alert" className="border-l-2 border-danger pl-3">
+          <p className="text-small text-danger">{describeError(errorCode).message}</p>
+          {describeError(errorCode).action && (
+            <p className="mt-1 text-small text-ink-muted">
+              {describeError(errorCode).action}
+            </p>
+          )}
+        </div>
       )}
 
       {downloadUrl && (
@@ -127,12 +133,18 @@ export function GenerateForm() {
         </p>
       )}
 
+      {pending && (
+        <p className="text-small text-ink-muted" role="status" aria-live="polite">
+          이 컴퓨터의 Codex CLI가 자료를 만들고 있습니다. 창을 닫으면 중단됩니다.
+        </p>
+      )}
+
       <button
         type="submit"
         disabled={pending}
         className="h-11 bg-seal text-small font-medium text-surface hover:bg-seal-deep disabled:opacity-60"
       >
-        {pending ? "만드는 중... (1~2분 걸릴 수 있습니다)" : "12장 만들기"}
+        {pending ? "만드는 중 · 최대 5분" : "12장 만들기"}
       </button>
     </form>
   );
