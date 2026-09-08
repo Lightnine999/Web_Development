@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "./login/actions";
 import { GenerateForm } from "./generate-form";
+import { DeckDeleteButton } from "./deck-delete-button";
 
 type DeckRow = {
   id: string;
@@ -64,13 +65,16 @@ export default async function HomePage() {
                     {new Date(deck.created_at).toLocaleString("ko-KR")}
                   </p>
                 </div>
-                {deck.downloadUrl ? (
-                  <a href={deck.downloadUrl} className="text-small font-medium">
-                    다운로드
-                  </a>
-                ) : (
-                  <span className="text-small text-ink-faint">만료됨</span>
-                )}
+                <div className="flex items-center gap-4">
+                  {deck.downloadUrl ? (
+                    <a href={deck.downloadUrl} className="text-small font-medium">
+                      다운로드
+                    </a>
+                  ) : (
+                    <span className="text-small text-ink-faint">만료됨</span>
+                  )}
+                  <DeckDeleteButton deckId={deck.id} />
+                </div>
               </li>
             ))}
           </ul>
