@@ -36,6 +36,7 @@ export default async function DeckPage({
   if (!deck) notFound();
 
   const parsedPlan = SlidePlanSchema.safeParse(deck.plan_json);
+  const isPdf = deck.storage_path.toLowerCase().endsWith(".pdf");
 
   const { data: signed } = await supabase.storage
     .from("decks")
@@ -67,7 +68,7 @@ export default async function DeckPage({
               href={signed.signedUrl}
               className="flex h-9 items-center bg-seal px-5 text-small font-medium text-surface no-underline hover:bg-seal-deep hover:no-underline"
             >
-              PPTX 다운로드
+              {isPdf ? "PDF 다운로드" : "PPTX 다운로드"}
             </a>
           ) : (
             <span className="text-small text-ink-faint">링크가 만료됐습니다</span>
@@ -79,9 +80,11 @@ export default async function DeckPage({
         <h1 className="text-title font-semibold tracking-[-0.015em]">
           {deck.company_name} IR 자료
         </h1>
-        <p className="mt-1.5 text-small text-ink-muted">
-          <span className="tnum">12</span>장
-        </p>
+        {parsedPlan.success && (
+          <p className="mt-1.5 text-small text-ink-muted">
+            <span className="tnum">{parsedPlan.data.slides.length}</span>장
+          </p>
+        )}
 
         <div className="mt-8">
           {parsedPlan.success ? (
