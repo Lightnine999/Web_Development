@@ -78,8 +78,9 @@ export async function POST(request: Request) {
   }
 
   let pptxBuffer: Buffer;
+  let slidePlan: Awaited<ReturnType<typeof generateSlidePlan>>;
   try {
-    const slidePlan = await generateSlidePlan(
+    slidePlan = await generateSlidePlan(
       parsedInput.data.companyName,
       parsedInput.data.sourceText,
     );
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
     user_id: user.id,
     company_name: parsedInput.data.companyName,
     storage_path: storagePath,
+    plan_json: slidePlan,
   });
   if (insertError) {
     return errorResponse("STORAGE_UNAVAILABLE", "생성 기록 저장에 실패했습니다", 502);
