@@ -144,7 +144,7 @@ export function GenerateForm() {
         disabled={pending}
         className="h-11 bg-seal text-small font-medium text-surface hover:bg-seal-deep disabled:opacity-60"
       >
-        {pending ? "만드는 중 · 최대 5분" : "12장 만들기"}
+        {pending ? "만드는 중 · 보통 2~3분" : "12장 만들기"}
       </button>
     </form>
   );

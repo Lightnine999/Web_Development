@@ -67,7 +67,7 @@ const GUIDANCE: Record<ErrorCode, Guidance> = {
     retryable: true,
   },
   CODEX_TIMEOUT: {
-    message: "자료를 만드는 데 5분을 넘겨 중단했습니다.",
+    message: "자료를 만드는 데 4분을 넘겨 중단했습니다.",
     action: "입력한 내용을 줄이면 대개 해결됩니다.",
     retryable: true,
   },
