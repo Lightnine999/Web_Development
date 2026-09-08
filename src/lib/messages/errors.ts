@@ -11,8 +11,10 @@ export type ErrorCode =
   | "PARSE_FAILED"
   | "CODEX_NOT_INSTALLED"
   | "CODEX_NOT_AUTHENTICATED"
+  | "CODEX_RATE_LIMITED"
   | "CODEX_TIMEOUT"
   | "CODEX_FAILED"
+  | "BACKEND_UNREACHABLE"
   | "AI_SCHEMA_INVALID"
   | "STORAGE_UNAVAILABLE"
   | "NETWORK";
@@ -64,6 +66,18 @@ const GUIDANCE: Record<ErrorCode, Guidance> = {
   CODEX_NOT_AUTHENTICATED: {
     message: "Codex CLI에 로그인되어 있지 않습니다.",
     action: "터미널에서 codex login 을 실행해 ChatGPT 계정으로 로그인한 뒤 다시 시도해주세요.",
+    retryable: true,
+  },
+  CODEX_RATE_LIMITED: {
+    message: "오늘 쓸 수 있는 생성 한도를 다 썼습니다.",
+    action:
+      "슬라이드는 ChatGPT 구독의 Codex 사용량을 씁니다. 한도가 다시 채워지면 같은 내용으로 다시 시도할 수 있습니다.",
+    retryable: true,
+  },
+  BACKEND_UNREACHABLE: {
+    message: "자료를 만드는 서버가 꺼져 있습니다.",
+    action:
+      "터미널에서 npm run backend:dev 를 실행한 뒤 다시 시도해주세요. 개발 서버와 함께 떠 있어야 합니다.",
     retryable: true,
   },
   CODEX_TIMEOUT: {

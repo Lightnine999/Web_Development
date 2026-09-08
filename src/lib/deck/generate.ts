@@ -28,8 +28,10 @@ const CODEX_TIMEOUT_MS = 240_000;
 export type CodexFailure =
   | "CODEX_NOT_INSTALLED"
   | "CODEX_NOT_AUTHENTICATED"
+  | "CODEX_RATE_LIMITED"
   | "CODEX_TIMEOUT"
   | "CODEX_FAILED"
+  | "BACKEND_UNREACHABLE"
   | "AI_SCHEMA_INVALID";
 
 export class CodexError extends Error {
@@ -42,11 +44,30 @@ export class CodexError extends Error {
   }
 }
 
-/** stderr에서 로그인 문제를 골라낸다. 판별이 안 되면 일반 실패로 둔다. */
+/**
+ * stderr에서 실패 원인을 골라낸다. 판별이 안 되면 일반 실패로 둔다.
+ *
+ * 사용량 한도를 로그인 실패보다 먼저 본다. 한도 메시지에도 "limit"과 함께
+ * 계정·플랜 관련 단어가 섞여 나와 authHints에 먼저 걸리면 엉뚱한 안내를 준다.
+ */
 function classifyStderr(stderr: string): CodexFailure {
   const lower = stderr.toLowerCase();
+
+  const limitHints = [
+    "usage limit",
+    "rate limit",
+    "quota",
+    "too many requests",
+    "limit reached",
+    "429",
+    "한도",
+  ];
+  if (limitHints.some((hint) => lower.includes(hint))) return "CODEX_RATE_LIMITED";
+
   const authHints = ["not logged in", "login", "unauthorized", "authenticat", "sign in", "api key"];
-  return authHints.some((hint) => lower.includes(hint)) ? "CODEX_NOT_AUTHENTICATED" : "CODEX_FAILED";
+  if (authHints.some((hint) => lower.includes(hint))) return "CODEX_NOT_AUTHENTICATED";
+
+  return "CODEX_FAILED";
 }
 
 const SYSTEM_PROMPT = `너는 회사 자료를 근거로 IR 컨설팅 자료의 12장 슬라이드 계획을 만드는 분석가다.

@@ -9,6 +9,7 @@
     "lint": "eslint",
     "codegen": "openapi-typescript ./openapi/ir-generator.yaml -o ./src/api/schema.d.ts",
     "check:codex": "tsx scripts/check-codex.ts",
+    "backend:dev": "tsx --env-file=.env.local backend/server.ts",
     "check:env": "tsx scripts/check-env.ts"
   },
   "dependencies": {

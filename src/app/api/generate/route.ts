@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { extractPdfText } from "@/lib/pdf";
 import { GenerateInputSchema, MAX_PDF_BYTES } from "@/lib/deck/schema";
-import { CodexError, generateSlidePlan } from "@/lib/deck/generate";
+import { CodexError } from "@/lib/deck/generate";
+import { generateSlidePlan } from "@/lib/deck/generate-client";
 import { renderDeck } from "@/lib/deck/render";
 
-// generateSlidePlan이 로컬 Codex CLI를 서브프로세스로 호출한다 —
-// 이 라우트는 codex 바이너리가 설치·로그인된 이 컴퓨터에서만 동작하며,
-// Vercel 등 원격 배포 환경에는 codex가 없어 그대로 실패한다.
+// generateSlidePlan(generate-client.ts)은 이제 로컬 codex를 직접 spawn하지 않고
+// BACKEND_URL(기본 http://localhost:8787)의 backend/server.ts에 HTTP로 요청한다.
+// 그 서버가 실제 Codex CLI를 서브프로세스로 호출하므로, backend/server.ts가
+// codex 바이너리가 설치·로그인된 컴퓨터에서 떠 있어야 생성이 된다.
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
