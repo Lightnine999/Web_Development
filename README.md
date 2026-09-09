@@ -136,6 +136,16 @@ npm run check:codex
 | `docs/FRONTEND_PRD_REVIEW.md` | PRD 검토 의견서. 확정한 수치와 미결정 처리 결과 |
 | `src/mocks/README.md` | 연결이 끊긴 초안의 정체와 되살리는 조건 |
 
+## 회고
+
+만드는 동안 부딪힌 것과 배운 것은 블로그에 남겼습니다.
+
+| 글 | 내용 |
+| --- | --- |
+| [프론트와 백엔드를 동시에 만들며 부딪힌 것들](https://lightnine999.github.io/blog_ggg/posts/parallel-frontend-backend/) | 세션 두 개를 병렬로 굴렸을 때의 조율 비용. 쓰이지 못한 1,916줄과 다음에 먼저 정할 세 가지 |
+| [눈대중으로 틀린 프론트엔드 세 가지](https://lightnine999.github.io/blog_ggg/posts/frontend-eyeball-mistakes/) | 눈으로 봐서 괜찮아 보였는데 틀린 것들 |
+| [무료 Codex CLI를 지키면서 Vercel에 배포하기](https://lightnine999.github.io/blog_ggg/posts/ir-generator-local-backend-vercel/) | 로컬 CLI를 유지한 채 프론트엔드만 배포한 과정 |
+
 ## 아직 없는 것
 
 - **슬라이드 미리보기** — `renderDeck`이 PPTX 버퍼만 만들고 이미지를 렌더하지 않습니다.
